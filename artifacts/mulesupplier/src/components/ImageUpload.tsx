@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { Image, Upload, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { resizeImage } from "@/lib/resizeImage";
 
 interface ImageUploadProps {
   value: string | null;
@@ -13,15 +14,11 @@ interface ImageUploadProps {
 export function ImageUpload({ value, onChange, className, placeholder = "Upload image", compact = false }: ImageUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const result = ev.target?.result;
-      if (typeof result === "string") onChange(result);
-    };
-    reader.readAsDataURL(file);
+    const dataUrl = await resizeImage(file);
+    onChange(dataUrl);
     e.target.value = "";
   }
 

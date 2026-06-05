@@ -9,6 +9,7 @@ import { actions } from "@/store";
 import type { Product } from "@/types";
 import { toast } from "sonner";
 import { Plus, X } from "lucide-react";
+import { resizeImage } from "@/lib/resizeImage";
 
 interface ProductDialogProps {
   open: boolean;
@@ -157,15 +158,11 @@ function ImageListSection({
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const result = ev.target?.result;
-      if (typeof result === "string") onAdd(result);
-    };
-    reader.readAsDataURL(file);
+    const dataUrl = await resizeImage(file);
+    onAdd(dataUrl);
     e.target.value = "";
   }
 

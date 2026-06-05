@@ -5,16 +5,33 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
+function isIos() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent);
+}
+
+function isInStandaloneMode() {
+  return (
+    window.matchMedia("(display-mode: standalone)").matches ||
+    ("standalone" in window.navigator && (window.navigator as { standalone?: boolean }).standalone === true)
+  );
+}
+
 export function useInstallPrompt() {
   const [prompt, setPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
+  const [ios, setIos] = useState(false);
 
   useEffect(() => {
-    // Already running as installed PWA
-    if (window.matchMedia("(display-mode: standalone)").matches) {
+    if (isInStandaloneMode()) {
       setInstalled(true);
       return;
     }
+    if (localStorage.getItem("ms.pwa.installed") === "true") {
+      setInstalled(true);
+      return;
+    }
+
+    setIos(isIos());
 
     const handler = (e: Event) => {
       e.preventDefault();
@@ -29,11 +46,6 @@ export function useInstallPrompt() {
 
     window.addEventListener("beforeinstallprompt", handler);
     window.addEventListener("appinstalled", installedHandler);
-
-    // Persist installed state
-    if (localStorage.getItem("ms.pwa.installed") === "true") {
-      setInstalled(true);
-    }
 
     return () => {
       window.removeEventListener("beforeinstallprompt", handler);
@@ -52,5 +64,10 @@ export function useInstallPrompt() {
     }
   }
 
-  return { canInstall: !!prompt && !installed, installed, triggerInstall };
+  return {
+    canInstall: !!prompt && !installed,
+    isIos: ios && !installed,
+    installed,
+    triggerInstall,
+  };
 }
