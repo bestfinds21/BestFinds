@@ -1,70 +1,72 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ImageUpload } from "@/components/ImageUpload";
-import { actions } from "@/store";
+import { updateStoreInfo } from "@/store";
 import type { StoreData } from "@/types";
-import { toast } from "sonner";
 
 interface EditStoreDialogProps {
   open: boolean;
-  onOpenChange: (v: boolean) => void;
   store: StoreData;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function EditStoreDialog({ open, onOpenChange, store }: EditStoreDialogProps) {
-  const [name, setName] = useState(store.storeName);
-  const [tagline, setTagline] = useState(store.tagline);
-  const [logo, setLogo] = useState<string | null>(store.logoImage);
+export function EditStoreDialog({ open, store, onOpenChange }: EditStoreDialogProps) {
+  const [storeName, setStoreName] = useState("");
+  const [tagline, setTagline] = useState("");
+  const [logoImage, setLogoImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (open) {
+      setStoreName(store.storeName);
+      setTagline(store.tagline);
+      setLogoImage(store.logoImage);
+    }
+  }, [open, store]);
 
   function handleSave() {
-    if (!name.trim()) return;
-    actions.updateSettings({ storeName: name.trim(), tagline: tagline.trim(), logoImage: logo });
+    const trimmed = storeName.trim();
+    if (!trimmed) return;
+    updateStoreInfo({ storeName: trimmed, tagline: tagline.trim(), logoImage });
     onOpenChange(false);
-    toast.success("Store updated");
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md rounded-2xl bg-card border-border">
+      <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle className="font-display text-xl">Edit store</DialogTitle>
+          <DialogTitle>Edit store info</DialogTitle>
         </DialogHeader>
-        <div className="space-y-5 py-2">
-          <div className="space-y-2">
-            <Label>Logo</Label>
-            <div className="w-28 h-28 mx-auto">
-              <ImageUpload value={logo} onChange={setLogo} className="w-28 h-28" compact placeholder="Logo" />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="store-name">Store name</Label>
+        <div className="space-y-4 pt-2">
+          <div className="space-y-1.5">
+            <Label>Store name</Label>
             <Input
-              id="store-name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Mulesupplier"
-              className="bg-muted border-border"
+              value={storeName}
+              onChange={(e) => setStoreName(e.target.value)}
+              placeholder="My Showroom"
+              autoFocus
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="tagline">Tagline</Label>
+          <div className="space-y-1.5">
+            <Label>Tagline</Label>
             <Input
-              id="tagline"
               value={tagline}
               onChange={(e) => setTagline(e.target.value)}
-              placeholder="Your private showroom"
-              className="bg-muted border-border"
+              placeholder="Premium finds, curated for you"
             />
           </div>
-          <div className="flex gap-3 justify-end pt-2">
-            <Button variant="ghost" onClick={() => onOpenChange(false)} className="rounded-full">
+          <div className="space-y-1.5">
+            <Label>Logo</Label>
+            <ImageUpload value={logoImage} onChange={setLogoImage} label="Upload logo" />
+          </div>
+          <div className="flex gap-2 pt-2">
+            <Button variant="outline" className="flex-1" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={!name.trim()} className="rounded-full bg-primary text-white">
-              Save changes
+            <Button className="flex-1" onClick={handleSave}>
+              Save
             </Button>
           </div>
         </div>

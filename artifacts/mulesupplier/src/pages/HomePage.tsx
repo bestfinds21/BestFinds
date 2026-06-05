@@ -1,168 +1,140 @@
 import { useSyncExternalStore, useState } from "react";
-import { motion, AnimatePresence, Reorder, useDragControls } from "framer-motion";
-import { Plus } from "lucide-react";
+import { Link } from "wouter";
+import { motion } from "framer-motion";
+import { Plus, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { StoreHeader } from "@/components/StoreHeader";
+import { subscribeStore, getStore, reorderCategories } from "@/store";
 import { CategoryCard } from "@/components/CategoryCard";
-import { EditStoreDialog } from "@/components/dialogs/EditStoreDialog";
 import { CategoryDialog } from "@/components/dialogs/CategoryDialog";
-import { loadStore, subscribe, actions } from "@/store";
+import { EditStoreDialog } from "@/components/dialogs/EditStoreDialog";
+import { StoreHeader } from "@/components/StoreHeader";
+import { ThemePicker } from "@/components/ThemePicker";
 import type { Category } from "@/types";
-import { toast } from "sonner";
 
-interface HomePageProps {
-  isEditor: boolean;
-}
-
-function DraggableCategoryItem({
-  cat,
-  productCount,
-  isEditor,
-  onEdit,
-  onDelete,
-}: {
-  cat: Category;
-  productCount: number;
-  isEditor: boolean;
-  onEdit: () => void;
-  onDelete: () => void;
-}) {
-  const controls = useDragControls();
-  return (
-    <Reorder.Item value={cat} dragListener={false} dragControls={controls}>
-      <CategoryCard
-        category={cat}
-        productCount={productCount}
-        isEditor={isEditor}
-        onEdit={onEdit}
-        onDelete={onDelete}
-        dragHandleProps={{ onPointerDown: (e: React.PointerEvent) => controls.start(e) }}
-      />
-    </Reorder.Item>
-  );
-}
-
-export function HomePage({ isEditor }: HomePageProps) {
-  const store = useSyncExternalStore(subscribe, loadStore);
-  const [editStoreOpen, setEditStoreOpen] = useState(false);
-  const [catDialogOpen, setCatDialogOpen] = useState(false);
+export function HomePage({ isEditor }: { isEditor: boolean }) {
+  const store = useSyncExternalStore(subscribeStore, getStore);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCat, setEditingCat] = useState<Category | null>(null);
-  const [categories, setCategories] = useState<Category[]>(store.categories);
+  const [editStoreOpen, setEditStoreOpen] = useState(false);
+  const [reordering, setReordering] = useState(false);
+  const [order, setOrder] = useState<Category[]>([]);
 
-  const storeCategories = store.categories;
-  if (JSON.stringify(categories.map((c) => c.id)) !== JSON.stringify(storeCategories.map((c) => c.id))) {
-    setCategories(storeCategories);
+  function startReorder() {
+    setOrder([...store.categories]);
+    setReordering(true);
   }
 
-  function handleReorder(newOrder: Category[]) {
-    setCategories(newOrder);
-    actions.reorderCategories(newOrder.map((c) => c.id));
+  function moveCategory(index: number, dir: -1 | 1) {
+    const next = [...order];
+    const target = index + dir;
+    if (target < 0 || target >= next.length) return;
+    [next[index], next[target]] = [next[target], next[index]];
+    setOrder(next);
   }
 
-  function handleDeleteCategory(id: string) {
-    if (!confirm("Delete this category and all its products?")) return;
-    actions.deleteCategory(id);
-    toast.success("Category deleted");
+  function saveReorder() {
+    reorderCategories(order);
+    setReordering(false);
   }
 
-  function handleShare() {
-    navigator.clipboard
-      .writeText(window.location.href)
-      .then(() => toast.success("Link copied to clipboard"))
-      .catch(() => toast.error("Could not copy link"));
-  }
+  const cats = reordering ? order : store.categories;
 
   return (
-    <>
-      <div className="min-h-[100dvh] pb-24">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <StoreHeader
-            store={store}
-            isEditor={isEditor}
-            onEdit={() => setEditStoreOpen(true)}
-            onShare={handleShare}
-          />
+    <div className="min-h-screen bg-background">
+      <StoreHeader
+        store={store}
+        isEditor={isEditor}
+        onEdit={() => setEditStoreOpen(true)}
+      />
 
-          <div className="mt-2">
-            {isEditor ? (
-              <Reorder.Group
-                axis="y"
-                values={categories}
-                onReorder={handleReorder}
-                className="grid grid-cols-2 sm:grid-cols-3 gap-4"
-              >
-                <AnimatePresence>
-                  {categories.map((cat) => {
-                    const count = store.products.filter((p) => p.categoryId === cat.id).length;
-                    return (
-                      <DraggableCategoryItem
-                        key={cat.id}
-                        cat={cat}
-                        productCount={count}
-                        isEditor={isEditor}
-                        onEdit={() => {
-                          setEditingCat(cat);
-                          setCatDialogOpen(true);
-                        }}
-                        onDelete={() => handleDeleteCategory(cat.id)}
-                      />
-                    );
-                  })}
-                </AnimatePresence>
-              </Reorder.Group>
+      <div className="max-w-2xl mx-auto px-4 pb-24">
+        {isEditor && (
+          <div className="flex gap-2 mb-4">
+            {reordering ? (
+              <>
+                <Button size="sm" variant="default" onClick={saveReorder}>
+                  Save order
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => setReordering(false)}>
+                  Cancel
+                </Button>
+              </>
             ) : (
-              <motion.div
-                className="grid grid-cols-2 sm:grid-cols-3 gap-4"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-              >
-                <AnimatePresence>
-                  {store.categories.map((cat) => {
-                    const count = store.products.filter((p) => p.categoryId === cat.id).length;
-                    return (
-                      <CategoryCard
-                        key={cat.id}
-                        category={cat}
-                        productCount={count}
-                        isEditor={false}
-                      />
-                    );
-                  })}
-                </AnimatePresence>
-              </motion.div>
-            )}
-
-            {store.categories.length === 0 && (
-              <div className="text-center py-20 text-muted-foreground">
-                <p className="text-lg">No categories yet.</p>
-                {isEditor && <p className="text-sm mt-1">Click "Add category" to get started.</p>}
-              </div>
+              <>
+                <Button size="sm" variant="outline" onClick={startReorder}>
+                  <ArrowUpDown className="h-3.5 w-3.5 mr-1.5" />
+                  Reorder
+                </Button>
+                <Button size="sm" onClick={() => { setEditingCat(null); setDialogOpen(true); }}>
+                  <Plus className="h-3.5 w-3.5 mr-1.5" />
+                  Add Category
+                </Button>
+              </>
             )}
           </div>
+        )}
 
-          {isEditor && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mt-6 flex justify-center"
-            >
-              <Button
-                onClick={() => {
-                  setEditingCat(null);
-                  setCatDialogOpen(true);
-                }}
-                className="rounded-full gap-2 bg-primary/20 text-primary hover:bg-primary/30 border border-primary/30"
+        {cats.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center py-20"
+          >
+            <p className="text-muted-foreground text-lg">
+              {isEditor ? "No categories yet. Add your first one!" : "No categories yet."}
+            </p>
+          </motion.div>
+        ) : (
+          <div className="grid grid-cols-2 gap-3">
+            {cats.map((cat, i) => (
+              <motion.div
+                key={cat.id}
+                layout
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: i * 0.04 }}
               >
-                <Plus className="w-4 h-4" />
-                Add category
-              </Button>
-            </motion.div>
-          )}
-        </div>
+                {reordering ? (
+                  <CategoryCard
+                    category={cat}
+                    isEditor={isEditor}
+                    reordering
+                    onMoveUp={i > 0 ? () => moveCategory(i, -1) : undefined}
+                    onMoveDown={i < cats.length - 1 ? () => moveCategory(i, 1) : undefined}
+                    onEdit={() => {}}
+                    onDelete={() => {}}
+                  />
+                ) : (
+                  <Link href={`/c/${cat.id}`}>
+                    <CategoryCard
+                      category={cat}
+                      isEditor={isEditor}
+                      onEdit={() => { setEditingCat(cat); setDialogOpen(true); }}
+                      onDelete={() => {}}
+                    />
+                  </Link>
+                )}
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
 
-      <EditStoreDialog open={editStoreOpen} onOpenChange={setEditStoreOpen} store={store} />
-      <CategoryDialog open={catDialogOpen} onOpenChange={setCatDialogOpen} editing={editingCat} />
-    </>
+      {isEditor && (
+        <>
+          <ThemePicker />
+          <CategoryDialog
+            open={dialogOpen}
+            category={editingCat}
+            onOpenChange={setDialogOpen}
+          />
+          <EditStoreDialog
+            open={editStoreOpen}
+            store={store}
+            onOpenChange={setEditStoreOpen}
+          />
+        </>
+      )}
+    </div>
   );
 }

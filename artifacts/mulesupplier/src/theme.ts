@@ -1,29 +1,35 @@
 export type Theme = "dark-purple" | "dark-white" | "white-black" | "light";
 
-const STORAGE_KEY = "ms.theme";
-const DEFAULT: Theme = "dark-purple";
+const THEME_KEY = "mule-theme-v1";
 
 export function getTheme(): Theme {
-  const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
-  return stored ?? DEFAULT;
+  return (localStorage.getItem(THEME_KEY) as Theme) ?? "dark-purple";
 }
 
 export function setTheme(theme: Theme) {
-  localStorage.setItem(STORAGE_KEY, theme);
+  localStorage.setItem(THEME_KEY, theme);
   applyTheme(theme);
 }
 
 export function applyTheme(theme: Theme) {
   const root = document.documentElement;
-  root.setAttribute("data-theme", theme);
-  // Keep Tailwind dark class in sync
-  if (theme === "white-black" || theme === "light") {
-    root.classList.remove("dark");
-  } else {
-    root.classList.add("dark");
-  }
-}
+  root.classList.remove("dark");
+  root.removeAttribute("data-theme");
 
-export function initTheme() {
-  applyTheme(getTheme());
+  switch (theme) {
+    case "dark-purple":
+      root.classList.add("dark");
+      root.setAttribute("data-theme", "dark-purple");
+      break;
+    case "dark-white":
+      root.classList.add("dark");
+      root.setAttribute("data-theme", "dark-white");
+      break;
+    case "white-black":
+      root.setAttribute("data-theme", "white-black");
+      break;
+    case "light":
+      root.setAttribute("data-theme", "light");
+      break;
+  }
 }

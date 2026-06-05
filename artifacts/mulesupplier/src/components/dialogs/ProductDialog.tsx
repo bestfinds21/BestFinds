@@ -1,24 +1,21 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ImageUpload } from "@/components/ImageUpload";
-import { actions } from "@/store";
+import { ImageUpload, MultiImageUpload } from "@/components/ImageUpload";
+import { addProduct, updateProduct } from "@/store";
 import type { Product } from "@/types";
-import { toast } from "sonner";
-import { Plus, X } from "lucide-react";
-import { resizeImage } from "@/lib/resizeImage";
 
 interface ProductDialogProps {
   open: boolean;
-  onOpenChange: (v: boolean) => void;
+  product: Product | null;
   categoryId: string;
-  editing?: Product | null;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function ProductDialog({ open, onOpenChange, categoryId, editing }: ProductDialogProps) {
+export function ProductDialog({ open, product, categoryId, onOpenChange }: ProductDialogProps) {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [notes, setNotes] = useState("");
@@ -27,175 +24,84 @@ export function ProductDialog({ open, onOpenChange, categoryId, editing }: Produ
   const [qcImages, setQcImages] = useState<string[]>([]);
 
   useEffect(() => {
-    if (editing) {
-      setName(editing.name);
-      setPrice(editing.price);
-      setNotes(editing.notes);
-      setMainImage(editing.mainImage);
-      setExtraImages(editing.extraImages);
-      setQcImages(editing.qcImages);
-    } else {
-      setName("");
-      setPrice("");
-      setNotes("");
-      setMainImage(null);
-      setExtraImages([]);
-      setQcImages([]);
+    if (open) {
+      setName(product?.name ?? "");
+      setPrice(product?.price ?? "");
+      setNotes(product?.notes ?? "");
+      setMainImage(product?.mainImage ?? null);
+      setExtraImages(product?.extraImages ?? []);
+      setQcImages(product?.qcImages ?? []);
     }
-  }, [editing, open]);
-
-  function addExtra(type: "extra" | "qc", value: string) {
-    if (type === "extra") setExtraImages((prev) => [...prev, value]);
-    else setQcImages((prev) => [...prev, value]);
-  }
-
-  function removeExtra(type: "extra" | "qc", index: number) {
-    if (type === "extra") setExtraImages((prev) => prev.filter((_, i) => i !== index));
-    else setQcImages((prev) => prev.filter((_, i) => i !== index));
-  }
+  }, [open, product]);
 
   function handleSave() {
-    if (!name.trim()) return;
-    const payload = { categoryId, name: name.trim(), price: price.trim(), notes: notes.trim(), mainImage, extraImages, qcImages };
-    if (editing) {
-      actions.updateProduct(editing.id, payload);
-      toast.success("Product updated");
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    const data = { name: trimmed, price: price.trim(), notes: notes.trim(), mainImage, extraImages, qcImages };
+    if (product) {
+      updateProduct(product.id, data);
     } else {
-      actions.addProduct(payload);
-      toast.success("Product added");
+      addProduct(categoryId, data);
     }
     onOpenChange(false);
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg max-h-[90dvh] overflow-y-auto rounded-2xl bg-card border-border">
+      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-display text-xl">
-            {editing ? "Edit product" : "Add product"}
-          </DialogTitle>
+          <DialogTitle>{product ? "Edit product" : "Add product"}</DialogTitle>
         </DialogHeader>
-        <div className="space-y-5 py-2">
-          <div className="space-y-2">
-            <Label>Main image</Label>
-            <ImageUpload value={mainImage} onChange={setMainImage} placeholder="Main product image" />
+        <div className="space-y-4 pt-2">
+          <div className="space-y-1.5">
+            <Label>Name</Label>
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Product name"
+              autoFocus
+            />
           </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="prod-name">Name</Label>
-              <Input
-                id="prod-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Classic Low Grey"
-                className="bg-muted border-border"
-                autoFocus
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="prod-price">Price</Label>
-              <Input
-                id="prod-price"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                placeholder="e.g. €25"
-                className="bg-muted border-border"
-              />
-            </div>
+          <div className="space-y-1.5">
+            <Label>Price (€)</Label>
+            <Input
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              placeholder="0.00"
+              inputMode="decimal"
+            />
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="prod-notes">Notes</Label>
+          <div className="space-y-1.5">
+            <Label>Notes</Label>
             <Textarea
-              id="prod-notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Sizing notes, batch info, etc."
-              className="bg-muted border-border resize-none"
+              placeholder="Size, color, description..."
               rows={3}
             />
           </div>
-
-          <ImageListSection
-            label="Extra images"
-            images={extraImages}
-            onAdd={(v) => addExtra("extra", v)}
-            onRemove={(i) => removeExtra("extra", i)}
-          />
-
-          <ImageListSection
-            label="QC images"
-            images={qcImages}
-            onAdd={(v) => addExtra("qc", v)}
-            onRemove={(i) => removeExtra("qc", i)}
-          />
-
-          <div className="flex gap-3 justify-end pt-2">
-            <Button variant="ghost" onClick={() => onOpenChange(false)} className="rounded-full">
+          <div className="space-y-1.5">
+            <Label>Main photo</Label>
+            <ImageUpload value={mainImage} onChange={setMainImage} label="Upload main photo" />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Extra photos</Label>
+            <MultiImageUpload values={extraImages} onChange={setExtraImages} label="Add photos" maxCount={8} />
+          </div>
+          <div className="space-y-1.5">
+            <Label>QC photos</Label>
+            <MultiImageUpload values={qcImages} onChange={setQcImages} label="QC photos" maxCount={10} />
+          </div>
+          <div className="flex gap-2 pt-2">
+            <Button variant="outline" className="flex-1" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={!name.trim()} className="rounded-full bg-primary text-white">
-              {editing ? "Save changes" : "Add product"}
+            <Button className="flex-1" onClick={handleSave}>
+              {product ? "Save" : "Add"}
             </Button>
           </div>
         </div>
       </DialogContent>
     </Dialog>
-  );
-}
-
-function ImageListSection({
-  label,
-  images,
-  onAdd,
-  onRemove,
-}: {
-  label: string;
-  images: string[];
-  onAdd: (v: string) => void;
-  onRemove: (i: number) => void;
-}) {
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const dataUrl = await resizeImage(file);
-    onAdd(dataUrl);
-    e.target.value = "";
-  }
-
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <Label>{label}</Label>
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 transition-colors"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          Add
-        </button>
-        <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
-      </div>
-      {images.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {images.map((img, i) => (
-            <div key={i} className="relative group w-20 h-20 rounded-lg overflow-hidden">
-              <img src={img} alt="" className="w-full h-full object-cover" />
-              <button
-                type="button"
-                onClick={() => onRemove(i)}
-                className="absolute top-1 right-1 p-0.5 rounded-full bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <X className="w-3 h-3" />
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
   );
 }

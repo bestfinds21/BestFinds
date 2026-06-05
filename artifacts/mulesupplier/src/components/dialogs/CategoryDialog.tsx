@@ -1,76 +1,67 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ImageUpload } from "@/components/ImageUpload";
-import { actions } from "@/store";
+import { addCategory, updateCategory } from "@/store";
 import type { Category } from "@/types";
-import { toast } from "sonner";
 
 interface CategoryDialogProps {
   open: boolean;
-  onOpenChange: (v: boolean) => void;
-  editing?: Category | null;
+  category: Category | null;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function CategoryDialog({ open, onOpenChange, editing }: CategoryDialogProps) {
+export function CategoryDialog({ open, category, onOpenChange }: CategoryDialogProps) {
   const [name, setName] = useState("");
-  const [cover, setCover] = useState<string | null>(null);
+  const [coverImage, setCoverImage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (editing) {
-      setName(editing.name);
-      setCover(editing.coverImage);
-    } else {
-      setName("");
-      setCover(null);
+    if (open) {
+      setName(category?.name ?? "");
+      setCoverImage(category?.coverImage ?? null);
     }
-  }, [editing, open]);
+  }, [open, category]);
 
   function handleSave() {
-    if (!name.trim()) return;
-    if (editing) {
-      actions.updateCategory(editing.id, { name: name.trim(), coverImage: cover });
-      toast.success("Category updated");
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    if (category) {
+      updateCategory(category.id, { name: trimmed, coverImage });
     } else {
-      actions.addCategory({ name: name.trim(), coverImage: cover });
-      toast.success("Category added");
+      addCategory(trimmed, coverImage);
     }
     onOpenChange(false);
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md rounded-2xl bg-card border-border">
+      <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle className="font-display text-xl">
-            {editing ? "Edit category" : "Add category"}
-          </DialogTitle>
+          <DialogTitle>{category ? "Edit category" : "Add category"}</DialogTitle>
         </DialogHeader>
-        <div className="space-y-5 py-2">
-          <div className="space-y-2">
-            <Label>Cover image</Label>
-            <ImageUpload value={cover} onChange={setCover} placeholder="Category cover" />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="cat-name">Name</Label>
+        <div className="space-y-4 pt-2">
+          <div className="space-y-1.5">
+            <Label>Name</Label>
             <Input
-              id="cat-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Sneakers"
-              className="bg-muted border-border"
+              placeholder="Category name"
               onKeyDown={(e) => e.key === "Enter" && handleSave()}
               autoFocus
             />
           </div>
-          <div className="flex gap-3 justify-end pt-2">
-            <Button variant="ghost" onClick={() => onOpenChange(false)} className="rounded-full">
+          <div className="space-y-1.5">
+            <Label>Cover image</Label>
+            <ImageUpload value={coverImage} onChange={setCoverImage} label="Upload cover" />
+          </div>
+          <div className="flex gap-2 pt-2">
+            <Button variant="outline" className="flex-1" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={!name.trim()} className="rounded-full bg-primary text-white">
-              {editing ? "Save changes" : "Add category"}
+            <Button className="flex-1" onClick={handleSave}>
+              {category ? "Save" : "Add"}
             </Button>
           </div>
         </div>

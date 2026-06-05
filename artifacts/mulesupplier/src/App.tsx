@@ -7,6 +7,7 @@ import { HomePage } from "@/pages/HomePage";
 import { CategoryPage } from "@/pages/CategoryPage";
 import { ProductPage } from "@/pages/ProductPage";
 import { isEditorUnlocked } from "@/store";
+import { applyTheme, getTheme } from "@/theme";
 
 function NotFound() {
   return (
@@ -34,6 +35,7 @@ function App() {
   const [isEditor, setIsEditor] = useState(() => isEditorUnlocked());
 
   useEffect(() => {
+    applyTheme(getTheme());
     setIsEditor(isEditorUnlocked());
   }, []);
 
