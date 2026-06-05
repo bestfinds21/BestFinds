@@ -1,4 +1,4 @@
-export type Theme = "dark-purple" | "dark-white" | "light";
+export type Theme = "dark-purple" | "dark-white" | "white-black" | "light";
 
 const STORAGE_KEY = "ms.theme";
 const DEFAULT: Theme = "dark-purple";
@@ -10,9 +10,20 @@ export function getTheme(): Theme {
 
 export function setTheme(theme: Theme) {
   localStorage.setItem(STORAGE_KEY, theme);
-  document.documentElement.setAttribute("data-theme", theme);
+  applyTheme(theme);
+}
+
+export function applyTheme(theme: Theme) {
+  const root = document.documentElement;
+  root.setAttribute("data-theme", theme);
+  // Keep Tailwind dark class in sync
+  if (theme === "white-black" || theme === "light") {
+    root.classList.remove("dark");
+  } else {
+    root.classList.add("dark");
+  }
 }
 
 export function initTheme() {
-  document.documentElement.setAttribute("data-theme", getTheme());
+  applyTheme(getTheme());
 }

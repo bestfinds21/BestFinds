@@ -43,7 +43,7 @@
 }
 
 /* ═══════════════════════════════════════════════
-   THEME: Dark Purple
+   THEME: Dark Purple  (boosted glows)
 ═══════════════════════════════════════════════ */
 :root,
 [data-theme="dark-purple"] {
@@ -79,22 +79,20 @@
   --app-font-mono:    Menlo, monospace;
   --radius: 0.75rem;
 
-  /* Glow tokens */
+  /* Glow tokens — intense */
   --glow-r: 124; --glow-g: 58; --glow-b: 237;
-  --glow-sm:   0 0 10px rgba(124,58,237,0.35), 0 0 30px rgba(124,58,237,0.18);
-  --glow-md:   0 0 0 1px rgba(124,58,237,0.20), 0 0 16px rgba(124,58,237,0.30), 0 0 48px rgba(124,58,237,0.16);
-  --glow-lg:   0 0 0 1px rgba(124,58,237,0.28), 0 0 20px rgba(124,58,237,0.40), 0 0 60px rgba(124,58,237,0.22), 0 0 120px rgba(124,58,237,0.10);
+  --glow-sm:   0 0 12px rgba(124,58,237,0.55), 0 0 36px rgba(124,58,237,0.28);
+  --glow-md:   0 0 0 1px rgba(124,58,237,0.28), 0 0 20px rgba(124,58,237,0.50), 0 0 60px rgba(124,58,237,0.28), 0 0 100px rgba(124,58,237,0.12);
+  --glow-lg:   0 0 0 1px rgba(124,58,237,0.38), 0 0 28px rgba(124,58,237,0.65), 0 0 80px rgba(124,58,237,0.38), 0 0 160px rgba(124,58,237,0.18);
 
-  /* Card hover glow */
-  --card-glow: 0 0 0 1px rgba(124,58,237,0.22), 0 0 24px rgba(124,58,237,0.18), 0 8px 32px rgba(0,0,0,0.5);
+  --card-glow: 0 0 0 1px rgba(124,58,237,0.30), 0 0 32px rgba(124,58,237,0.32), 0 8px 40px rgba(0,0,0,0.55);
 
-  /* Ambient background blobs */
-  --blob-1: radial-gradient(ellipse 60% 40% at 80% 10%, rgba(124,58,237,0.12) 0%, transparent 70%);
-  --blob-2: radial-gradient(ellipse 50% 35% at 15% 85%, rgba(124,58,237,0.08) 0%, transparent 70%);
+  --blob-1: radial-gradient(ellipse 65% 45% at 80% 10%, rgba(124,58,237,0.20) 0%, transparent 70%);
+  --blob-2: radial-gradient(ellipse 55% 40% at 15% 85%, rgba(124,58,237,0.14) 0%, transparent 70%);
 }
 
 /* ═══════════════════════════════════════════════
-   THEME: Dark White Glow
+   THEME: Dark White Glow  (boosted glows)
 ═══════════════════════════════════════════════ */
 [data-theme="dark-white"] {
   --background:          0 0% 3.5%;
@@ -129,16 +127,64 @@
   --app-font-mono:    Menlo, monospace;
   --radius: 0.75rem;
 
-  /* White glow tokens — multi-layer bloom */
+  /* White glow — intense bloom */
   --glow-r: 255; --glow-g: 255; --glow-b: 255;
-  --glow-sm:   0 0 8px rgba(255,255,255,0.30), 0 0 24px rgba(255,255,255,0.14);
-  --glow-md:   0 0 0 1px rgba(255,255,255,0.14), 0 0 16px rgba(255,255,255,0.28), 0 0 48px rgba(255,255,255,0.12);
-  --glow-lg:   0 0 0 1px rgba(255,255,255,0.22), 0 0 20px rgba(255,255,255,0.45), 0 0 60px rgba(255,255,255,0.22), 0 0 120px rgba(255,255,255,0.10);
+  --glow-sm:   0 0 10px rgba(255,255,255,0.50), 0 0 30px rgba(255,255,255,0.24);
+  --glow-md:   0 0 0 1px rgba(255,255,255,0.22), 0 0 20px rgba(255,255,255,0.50), 0 0 60px rgba(255,255,255,0.24), 0 0 100px rgba(255,255,255,0.10);
+  --glow-lg:   0 0 0 1px rgba(255,255,255,0.32), 0 0 28px rgba(255,255,255,0.70), 0 0 80px rgba(255,255,255,0.38), 0 0 160px rgba(255,255,255,0.16);
 
-  --card-glow: 0 0 0 1px rgba(255,255,255,0.14), 0 0 28px rgba(255,255,255,0.18), 0 8px 32px rgba(0,0,0,0.6);
+  --card-glow: 0 0 0 1px rgba(255,255,255,0.20), 0 0 36px rgba(255,255,255,0.30), 0 8px 40px rgba(0,0,0,0.65);
 
-  --blob-1: radial-gradient(ellipse 55% 38% at 75% 8%, rgba(255,255,255,0.07) 0%, transparent 70%);
-  --blob-2: radial-gradient(ellipse 45% 32% at 20% 88%, rgba(255,255,255,0.05) 0%, transparent 70%);
+  --blob-1: radial-gradient(ellipse 55% 38% at 75% 8%, rgba(255,255,255,0.10) 0%, transparent 70%);
+  --blob-2: radial-gradient(ellipse 45% 32% at 20% 88%, rgba(255,255,255,0.07) 0%, transparent 70%);
+}
+
+/* ═══════════════════════════════════════════════
+   THEME: White & Black
+═══════════════════════════════════════════════ */
+[data-theme="white-black"] {
+  --background:          0 0% 100%;
+  --foreground:          0 0% 4%;
+  --border:              0 0% 88%;
+  --input:               0 0% 90%;
+  --ring:                0 0% 10%;
+
+  --card:                0 0% 98%;
+  --card-foreground:     0 0% 4%;
+
+  --popover:             0 0% 100%;
+  --popover-foreground:  0 0% 4%;
+
+  --primary:             0 0% 6%;
+  --primary-foreground:  0 0% 98%;
+
+  --secondary:           0 0% 93%;
+  --secondary-foreground:0 0% 18%;
+
+  --muted:               0 0% 94%;
+  --muted-foreground:    0 0% 42%;
+
+  --accent:              0 0% 93%;
+  --accent-foreground:   0 0% 10%;
+
+  --destructive:         0 65% 44%;
+  --destructive-foreground: 0 0% 98%;
+
+  --app-font-sans:    'Plus Jakarta Sans', sans-serif;
+  --app-font-display: 'Outfit', sans-serif;
+  --app-font-mono:    Menlo, monospace;
+  --radius: 0.75rem;
+
+  /* Black glow — deep shadows */
+  --glow-r: 0; --glow-g: 0; --glow-b: 0;
+  --glow-sm:   0 2px 16px rgba(0,0,0,0.22), 0 1px 4px rgba(0,0,0,0.14);
+  --glow-md:   0 0 0 1px rgba(0,0,0,0.10), 0 4px 32px rgba(0,0,0,0.22), 0 2px 12px rgba(0,0,0,0.16), 0 0 60px rgba(0,0,0,0.08);
+  --glow-lg:   0 0 0 1px rgba(0,0,0,0.14), 0 6px 40px rgba(0,0,0,0.30), 0 16px 80px rgba(0,0,0,0.20), 0 0 120px rgba(0,0,0,0.10);
+
+  --card-glow: 0 0 0 1px rgba(0,0,0,0.10), 0 8px 40px rgba(0,0,0,0.18), 0 2px 10px rgba(0,0,0,0.10);
+
+  --blob-1: radial-gradient(ellipse 60% 40% at 80% 5%, rgba(0,0,0,0.04) 0%, transparent 70%);
+  --blob-2: radial-gradient(ellipse 50% 30% at 10% 90%, rgba(0,0,0,0.03) 0%, transparent 70%);
 }
 
 /* ═══════════════════════════════════════════════
@@ -178,14 +224,14 @@
   --radius: 0.75rem;
 
   --glow-r: 109; --glow-g: 40; --glow-b: 217;
-  --glow-sm:   0 2px 12px rgba(109,40,217,0.16), 0 1px 4px rgba(109,40,217,0.10);
-  --glow-md:   0 0 0 1px rgba(109,40,217,0.12), 0 4px 24px rgba(109,40,217,0.16), 0 2px 8px rgba(109,40,217,0.10);
-  --glow-lg:   0 0 0 1px rgba(109,40,217,0.16), 0 4px 20px rgba(109,40,217,0.22), 0 12px 48px rgba(109,40,217,0.14);
+  --glow-sm:   0 2px 14px rgba(109,40,217,0.22), 0 1px 4px rgba(109,40,217,0.14);
+  --glow-md:   0 0 0 1px rgba(109,40,217,0.14), 0 4px 28px rgba(109,40,217,0.22), 0 2px 8px rgba(109,40,217,0.14);
+  --glow-lg:   0 0 0 1px rgba(109,40,217,0.18), 0 6px 28px rgba(109,40,217,0.28), 0 16px 56px rgba(109,40,217,0.18);
 
-  --card-glow: 0 0 0 1px rgba(109,40,217,0.10), 0 8px 32px rgba(109,40,217,0.10), 0 2px 8px rgba(0,0,0,0.06);
+  --card-glow: 0 0 0 1px rgba(109,40,217,0.12), 0 8px 36px rgba(109,40,217,0.14), 0 2px 8px rgba(0,0,0,0.06);
 
-  --blob-1: radial-gradient(ellipse 60% 40% at 80% 5%, rgba(139,92,246,0.07) 0%, transparent 70%);
-  --blob-2: radial-gradient(ellipse 50% 30% at 10% 90%, rgba(139,92,246,0.05) 0%, transparent 70%);
+  --blob-1: radial-gradient(ellipse 60% 40% at 80% 5%, rgba(139,92,246,0.09) 0%, transparent 70%);
+  --blob-2: radial-gradient(ellipse 50% 30% at 10% 90%, rgba(139,92,246,0.06) 0%, transparent 70%);
 }
 
 /* ═══════════════════════════════════════════════
@@ -194,18 +240,41 @@
 @layer base {
   * {
     @apply border-border;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
   }
 
   html {
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    overscroll-behavior: none;
   }
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
     min-height: 100dvh;
-    /* Ambient blobs */
     background-image: var(--blob-1), var(--blob-2);
     background-attachment: fixed;
+    overscroll-behavior: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Smooth scrolling containers */
+  [data-scroll], .overflow-y-auto, .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+
+  /* Make all interactive elements respond faster on mobile */
+  button, a, [role="button"] {
+    touch-action: manipulation;
+    cursor: pointer;
+  }
+
+  img {
+    image-rendering: auto;
   }
 }
 
@@ -216,24 +285,32 @@
   font-family: var(--app-font-display);
 }
 
-/* Glow classes — use the theme tokens */
+/* Glow classes */
 .glow-sm     { box-shadow: var(--glow-sm); }
 .glow-purple { box-shadow: var(--glow-md); }
 .glow-purple-strong { box-shadow: var(--glow-lg); }
 
 /* Premium card — glass border + depth shadow + hover bloom */
 .card-premium {
-  transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+  transition: box-shadow 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+              transform   0.3s cubic-bezier(0.23, 1, 0.32, 1),
+              border-color 0.3s ease;
+  will-change: transform, box-shadow;
+  backface-visibility: hidden;
 }
 .card-premium:hover {
   box-shadow: var(--card-glow);
-  transform: translateY(-2px);
+  transform: translateY(-3px) scale(1.01);
+}
+.card-premium:active {
+  transform: translateY(-1px) scale(0.99);
 }
 
 /* Logo glow — animated pulse */
 .logo-glow {
   box-shadow: var(--glow-md);
   animation: logo-pulse 4s ease-in-out infinite;
+  will-change: box-shadow;
 }
 @keyframes logo-pulse {
   0%, 100% { box-shadow: var(--glow-md); }
@@ -247,13 +324,19 @@
   scrollbar-width: none;
 }
 
-/* Smooth theme transition */
-*, *::before, *::after {
-  transition-property: background-color, border-color, color, box-shadow;
-  transition-duration: 220ms;
-  transition-timing-function: ease;
+/* ═══════════════════════════════════════════════
+   SMOOTH THEME TRANSITION
+═══════════════════════════════════════════════ */
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color, box-shadow, opacity;
+  transition-duration: 240ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
-/* But don't animate transforms (breaks framer-motion) */
-[style*="transform"], [data-framer] {
-  transition-property: background-color, border-color, color, box-shadow;
+
+/* Never slow down transforms — Framer Motion owns those */
+[style*="transform"],
+[data-framer-motion] {
+  transition-property: background-color, border-color, color, box-shadow, opacity;
 }

@@ -18,12 +18,12 @@ interface StoreHeaderProps {
 export function StoreHeader({ store, isEditor, onEdit }: StoreHeaderProps) {
   return (
     <div className="flex flex-col items-center justify-center text-center py-12 px-4 relative">
-      {/* Theme picker */}
+      {/* Theme picker — top left, always accessible */}
       <div className="absolute top-4 left-4">
         <ThemePicker />
       </div>
 
-      {/* Three-dot editor menu */}
+      {/* Editor menu — top right */}
       {isEditor && (
         <div className="absolute top-4 right-4">
           <DropdownMenu>
