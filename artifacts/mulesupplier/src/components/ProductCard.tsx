@@ -49,13 +49,11 @@ export function ProductCard({ product, isEditor, onEdit, onDelete, dragHandlePro
           {/* Subtle bottom gradient for badge readability */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
 
-          {/* QC badge — top left */}
-          {qcCount > 0 && (
-            <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-1 rounded-full bg-black/65 backdrop-blur-sm border border-white/10">
-              <Camera className="w-3 h-3 text-white/80" />
-              <span className="text-white text-[11px] font-semibold leading-none">QC {qcCount}</span>
-            </div>
-          )}
+          {/* QC badge — top left, always visible */}
+          <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-1 rounded-full bg-black/65 backdrop-blur-sm border border-white/10">
+            <Camera className="w-3 h-3 text-white/80" />
+            <span className="text-white text-[11px] font-semibold leading-none">QC {qcCount}</span>
+          </div>
 
           {/* Three-dot menu — top right, always visible in editor */}
           {isEditor && (
